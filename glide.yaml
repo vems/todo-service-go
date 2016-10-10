@@ -1,0 +1,17 @@
+package: github.com/vems/todo-service-go
+import:
+- package: github.com/go-kit/kit
+  version: ^0.2.0
+  subpackages:
+  - endpoint
+  - log
+  - transport/grpc
+- package: github.com/vems/pb
+  version: ^1.0.1
+  subpackages:
+  - todo
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: google.golang.org/grpc
+  version: ^1.0.1-GA
