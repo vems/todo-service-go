@@ -34,8 +34,48 @@ func NewTodo() (pb.TodoServer, error) {
 		allEndpoint = EndpointLoggingMiddleware(allLogger)(allEndpoint)
 	}
 
+	var createEndpoint endpoint.Endpoint
+	{
+		createLogger := log.NewContext(logger).With("method", "Create")
+		createEndpoint = MakeCreateEndpoint(service)
+		createEndpoint = EndpointLoggingMiddleware(createLogger)(createEndpoint)
+	}
+
+	var findEndpoint endpoint.Endpoint
+	{
+		findLogger := log.NewContext(logger).With("method", "Find")
+		findEndpoint = MakeFindEndpoint(service)
+		findEndpoint = EndpointLoggingMiddleware(findLogger)(findEndpoint)
+	}
+
+	var updateEndpoint endpoint.Endpoint
+	{
+		updateLogger := log.NewContext(logger).With("method", "Update")
+		updateEndpoint = MakeUpdateEndpoint(service)
+		updateEndpoint = EndpointLoggingMiddleware(updateLogger)(updateEndpoint)
+	}
+
+	var deleteEndpoint endpoint.Endpoint
+	{
+		deleteLogger := log.NewContext(logger).With("method", "Delete")
+		deleteEndpoint = MakeDeleteEndpoint(service)
+		deleteEndpoint = EndpointLoggingMiddleware(deleteLogger)(deleteEndpoint)
+	}
+
+	var deleteAllEndpoint endpoint.Endpoint
+	{
+		deleteAllLogger := log.NewContext(logger).With("method", "DeleteAll")
+		deleteAllEndpoint = MakeDeleteAllEndpoint(service)
+		deleteAllEndpoint = EndpointLoggingMiddleware(deleteAllLogger)(deleteAllEndpoint)
+	}
+
 	endpoints := Endpoints{
-		AllEndpoint: allEndpoint,
+		AllEndpoint:       allEndpoint,
+		CreateEndpoint:    createEndpoint,
+		FindEndpoint:      findEndpoint,
+		UpdateEndpoint:    updateEndpoint,
+		DeleteEndpoint:    deleteEndpoint,
+		DeleteAllEndpoint: deleteAllEndpoint,
 	}
 
 	// Mechanical domain.

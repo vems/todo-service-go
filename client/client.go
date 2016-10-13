@@ -33,7 +33,92 @@ func New(conn *grpc.ClientConn, logger log.Logger) todo.Service {
 		}))(allEndpoint)
 	}
 
+	var createEndpoint endpoint.Endpoint
+	{
+		createEndpoint = grpctransport.NewClient(
+			conn,
+			"Todo",
+			"Create",
+			todo.EncodeGRPCCreateRequest,
+			todo.DecodeGRPCTodoResponse,
+			pb.TodoResponse{},
+		).Endpoint()
+		createEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Create",
+			Timeout: 30 * time.Second,
+		}))(createEndpoint)
+	}
+
+	var findEndpoint endpoint.Endpoint
+	{
+		findEndpoint = grpctransport.NewClient(
+			conn,
+			"Todo",
+			"Find",
+			todo.EncodeGRPCFindRequest,
+			todo.DecodeGRPCTodoResponse,
+			pb.TodoResponse{},
+		).Endpoint()
+		findEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Find",
+			Timeout: 30 * time.Second,
+		}))(findEndpoint)
+	}
+
+	var updateEndpoint endpoint.Endpoint
+	{
+		updateEndpoint = grpctransport.NewClient(
+			conn,
+			"Todo",
+			"Update",
+			todo.EncodeGRPCUpdateRequest,
+			todo.DecodeGRPCTodoResponse,
+			pb.TodoResponse{},
+		).Endpoint()
+		updateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Update",
+			Timeout: 30 * time.Second,
+		}))(updateEndpoint)
+	}
+
+	var deleteEndpoint endpoint.Endpoint
+	{
+		deleteEndpoint = grpctransport.NewClient(
+			conn,
+			"Todo",
+			"Delete",
+			todo.EncodeGRPCDeleteRequest,
+			todo.DecodeGRPCDeleteResponse,
+			pb.DeleteResponse{},
+		).Endpoint()
+		deleteEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "Delete",
+			Timeout: 30 * time.Second,
+		}))(deleteEndpoint)
+	}
+
+	var deleteAllEndpoint endpoint.Endpoint
+	{
+		deleteAllEndpoint = grpctransport.NewClient(
+			conn,
+			"Todo",
+			"DeleteAll",
+			todo.EncodeGRPCDeleteAllRequest,
+			todo.DecodeGRPCDeleteAllResponse,
+			pb.DeleteAllResponse{},
+		).Endpoint()
+		deleteAllEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    "DeleteAll",
+			Timeout: 30 * time.Second,
+		}))(deleteAllEndpoint)
+	}
+
 	return todo.Endpoints{
-		AllEndpoint: allEndpoint,
+		AllEndpoint:       allEndpoint,
+		CreateEndpoint:    createEndpoint,
+		FindEndpoint:      findEndpoint,
+		UpdateEndpoint:    updateEndpoint,
+		DeleteEndpoint:    deleteEndpoint,
+		DeleteAllEndpoint: deleteAllEndpoint,
 	}
 }
